@@ -4,21 +4,75 @@
     <meta charset="UTF-8">
     <title>Encabezado Dinámico</title>
     <style>
-        /* PEGUE AQUÍ TODO SU CÓDIGO CSS DE CODEPEN */
         body {
             margin: 0;
             padding: 0;
-            font-family: sans-serif;
-            background: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: transparent !important;
+            color: #37352f; /* Color de texto estilo Notion Light */
         }
+        #header-dinamico {
+            padding: 20px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb); /* Gradiente gris sutil */
+            text-align: center;
+        }
+        #saludo-fecha {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        #frase {
+            font-style: italic;
+            color: #6b7280;
+            font-size: 1em;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+        } 
     </style>
 </head>
 <body>
 
-    <!-- PEGUE AQUÍ TODO SU CÓDIGO HTML DE CODEPEN -->
+    <!-- CONTENEDORES HTML REQUERIDOS -->
+    <div id="header-dinamico">
+        <div id="saludo-fecha">
+            <span id="saludo"></span>, hoy es <span id="fecha"></span>
+        </div>
+        <div id="frase"></div>
+    </div>
 
+    <!-- LÓGICA EN JAVASCRIPT -->
     <script>
-        // PEGUE AQUÍ TODO SU CÓDIGO JAVASCRIPT DE CODEPEN
+        function actualizarHeader() {
+            const ahora = new Date();
+            const hora = ahora.getHours();
+            let saludo = "¡Hola!";
+
+            // 1. Saludo Personalizado Dinámico
+            if (hora >= 6 && hora < 12) saludo = "🌅 ¡Buenos días!";
+            else if (hora >= 12 && hora < 20) saludo = "☀️ ¡Buenas tardes!";
+            else saludo = "🌙 ¡Buenas noches!";
+            document.getElementById("saludo").innerText = saludo;
+
+            // 2. Fecha Actualizada Automáticamente
+            const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById("fecha").innerText = ahora.toLocaleDateString('es-ES', opciones);
+
+            // 3. Frase Motivacional Rotativa
+            const frases = [
+                "El único modo de hacer un gran trabajo es amar lo que haces.",
+                "Haz de hoy tu obra maestra.",
+                "Tu productividad es el resultado de tu enfoque.",
+                "Pequeños pasos todos los días conducen a grandes resultados."
+            ];
+            const fraseAleatoria = frases[Math.floor(Math.random() * frases.length)];
+            document.getElementById("frase").innerText = `"${fraseAleatoria}"`;
+        }
+
+        // Ejecutar la función inmediatamente al cargar la página
+        actualizarHeader();
     </script>
 </body>
 </html>
