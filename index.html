@@ -15,24 +15,25 @@
         #header-dinamico {
             padding: 24px;
             border-radius: 8px;
+            /* Fondo por defecto si no hay nada guardado */
             background: linear-gradient(135deg, #f3f4f6, #e5e7eb); 
             text-align: center;
             box-sizing: border-box;
             position: relative;
+            transition: background 0.4s ease; /* Transición suave al cambiar de color */
         }
 
-        /* 3. SALUDO CON NOMBRE */
         #saludo-fecha {
             font-size: 1.4em;
             font-weight: bold;
             margin-bottom: 8px;
             color: #37352f;
+            transition: color 0.3s ease;
         }
 
-        /* 1 & 2. FRASE DINÁMICA CON COLOR PERSONALIZABLE */
         #frase {
             font-style: italic;
-            color: #ff6b00; /* Color por defecto */
+            color: #ff6b00; 
             font-size: 1.1em;
             font-weight: 500;
             margin-bottom: 16px;
@@ -54,7 +55,7 @@
         #config-toggle:hover { opacity: 1; }
 
         #panel-ajustes {
-            display: none; /* Oculto por defecto para mantener limpio Notion */
+            display: none; 
             background: #ffffff;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
@@ -86,7 +87,6 @@
             margin-top: 2px;
         }
 
-        /* INPUTS Y BOTONES */
         input[type="text"] {
             width: 100%;
             padding: 6px 10px;
@@ -122,7 +122,14 @@
             border-color: #9ca3af;
         }
 
-        /* Selector de color nativo estilizado */
+        /* Selectores de color en línea */
+        .control-color {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
         input[type="color"] {
             border: none;
             width: 40px;
@@ -131,12 +138,19 @@
             cursor: pointer;
             background: none;
         }
+
+        select {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            color: #37352f;
+            font-size: 0.85em;
+        }
     </style>
 </head>
 <body>
 
     <div id="header-dinamico">
-        <!-- Icono de engranaje para abrir configuraciones -->
         <button id="config-toggle" onclick="toggleAjustes()" title="Personalizar panel">⚙️</button>
 
         <div id="saludo-fecha">
@@ -145,22 +159,30 @@
         
         <div id="frase"></div>
 
-        <!-- PANEL DE CONTROL INTERACTIVO -->
         <div id="panel-ajustes">
-            <!-- 3. CONFIGURACIÓN DEL NOMBRE -->
             <div class="seccion-ajuste">
                 <label for="input-nombre">Nombre o Apodo</label>
                 <input type="text" id="input-nombre" placeholder="Ej. Juan José o Misterio" oninput="guardarNombre()">
                 <div class="nota-gris">Ingresa nombre o apodo (si lo desea).</div>
             </div>
 
-            <!-- 1. EDIT COLOR FRASE -->
-            <div class="seccion-ajuste" style="display: flex; align-items: center; gap: 10px;">
+            <div class="seccion-ajuste control-color">
                 <label style="margin-bottom: 0;">Edit color frase:</label>
                 <input type="color" id="selector-color" value="#ff6b00" onchange="cambiarColorFrase(this.value)">
             </div>
 
-            <!-- 2. CAMBIAR FRASE -->
+            <div class="seccion-ajuste">
+                <label>Fondo de la ventana:</label>
+                <div class="control-color" style="margin-top: 4px;">
+                    <select id="selector-tipo-fondo" onchange="actualizarOpcionesFondo()">
+                        <option value="gradiente">Gradiente Gris (Default)</option>
+                        <option value="solido">Color Sólido</option>
+                        <option value="oscuro">Estilo Modo Oscuro</option>
+                    </select>
+                    <input type="color" id="selector-color-fondo" value="#f3f4f6" onchange="cambiarColorFondoSolido(this.value)" style="display:none;">
+                </div>
+            </div>
+
             <div class="grupo-botones">
                 <button class="btn" onclick="cambiarFrase()">🔄 Cambiar frase</button>
                 <button class="btn" style="margin-left: auto; background-color: #f3f4f6;" onclick="toggleAjustes()">Listo</button>
@@ -177,7 +199,6 @@
         ];
 
         function inicializarHeader() {
-            // 1. Configurar Saludo según la hora
             const ahora = new Date();
             const hora = ahora.getHours();
             let saludo = "¡Hola!";
@@ -187,42 +208,47 @@
             else saludo = "🌙 ¡Buenas noches!,";
             document.getElementById("saludo").innerText = saludo;
 
-            // 2. Configurar Fecha actualizada
             const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById("fecha").innerText = ahora.toLocaleDateString('es-ES', opciones);
 
-            // 3. Cargar datos persistentes (Local Storage) para que Notion recuerde el nombre y color escogido
+            // Cargar Nombre
             const nombreGuardado = localStorage.getItem('usuario-nombre') || "";
             document.getElementById('input-nombre').value = nombreGuardado;
             actualizarVisualizacionNombre(nombreGuardado);
 
+            // Cargar Color de Frase
             const colorGuardado = localStorage.getItem('usuario-color-frase') || "#ff6b00";
             document.getElementById('selector-color').value = colorGuardado;
             cambiarColorFrase(colorGuardado);
 
-            // Cargar frase inicial aleatoria
+            // Cargar Tipo de Fondo Guardado
+            const tipoFondoGuardado = localStorage.getItem('usuario-tipo-fondo') || "gradiente";
+            document.getElementById('selector-tipo-fondo').value = tipoFondoGuardado;
+            
+            const colorFondoGuardado = localStorage.getItem('usuario-color-fondo') || "#f3f4f6";
+            document.getElementById('selector-color-fondo').value = colorFondoGuardado;
+            
+            aplicarFondo(tipoFondoGuardado, colorFondoGuardado);
+            actualizarOpcionesFondo();
+
             cambiarFrase();
         }
 
-        // Intercambiar visibilidad del panel de herramientas
         function toggleAjustes() {
             const panel = document.getElementById('panel-ajustes');
             panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
         }
 
-        // Lógica para el botón de cambio de frase
         function cambiarFrase() {
             const fraseAleatoria = frases[Math.floor(Math.random() * frases.length)];
             document.getElementById("frase").innerText = `"${fraseAleatoria}"`;
         }
 
-        // Lógica para cambiar y guardar el color de la frase
         function cambiarColorFrase(nuevoColor) {
             document.getElementById('frase').style.color = nuevoColor;
             localStorage.setItem('usuario-color-frase', nuevoColor);
         }
 
-        // Lógica para guardar el nombre de usuario de forma local
         function guardarNombre() {
             const nombre = document.getElementById('input-nombre').value;
             localStorage.setItem('usuario-nombre', nombre);
@@ -235,11 +261,47 @@
                 contenedorNombre.innerText = nombre;
                 contenedorNombre.style.display = "inline";
             } else {
-                contenedorNombre.style.display = "none"; // Si está vacío, no rompe la gramática
+                contenedorNombre.style.display = "none";
             }
         }
 
-        // Arrancar el script de inmediato
+        /* LÓGICA DE CONTROL PARA EL FONDO DE LA VENTANA */
+        function actualizarOpcionesFondo() {
+            const tipo = document.getElementById('selector-tipo-fondo').value;
+            const selectorColor = document.getElementById('selector-color-fondo');
+            
+            // Mostrar la paleta de colores solo si elige fondo sólido
+            if (tipo === 'solido') {
+                selectorColor.style.display = 'inline-block';
+            } else {
+                selectorColor.style.display = 'none';
+            }
+            
+            localStorage.setItem('usuario-tipo-fondo', tipo);
+            aplicarFondo(tipo, selectorColor.value);
+        }
+
+        function cambiarColorFondoSolido(color) {
+            localStorage.setItem('usuario-color-fondo', color);
+            aplicarFondo('solido', color);
+        }
+
+        function aplicarFondo(tipo, colorSolido) {
+            const contenedor = document.getElementById('header-dinamico');
+            const textoSaludo = document.getElementById('saludo-fecha');
+
+            if (tipo === 'gradiente') {
+                contenedor.style.background = "linear-gradient(135deg, #f3f4f6, #e5e7eb)";
+                textoSaludo.style.color = "#37352f";
+            } else if (tipo === 'solido') {
+                contenedor.style.background = colorSolido;
+                textoSaludo.style.color = "#37352f";
+            } else if (tipo === 'oscuro') {
+                contenedor.style.background = "#202020"; // Fondo gris oscuro tipo Notion Dark
+                textoSaludo.style.color = "#ffffff"; // Cambia texto principal a blanco para contraste
+            }
+        }
+
         inicializarHeader();
     </script>
 </body>
