@@ -15,12 +15,11 @@
         #header-dinamico {
             padding: 24px;
             border-radius: 8px;
-            /* Fondo por defecto si no hay nada guardado */
             background: linear-gradient(135deg, #f3f4f6, #e5e7eb); 
             text-align: center;
             box-sizing: border-box;
             position: relative;
-            transition: background 0.4s ease; /* Transición suave al cambiar de color */
+            transition: background 0.4s ease;
         }
 
         #saludo-fecha {
@@ -36,21 +35,22 @@
             color: #ff6b00; 
             font-size: 1.1em;
             font-weight: 500;
-            margin-bottom: 16px;
+            margin-bottom: 24px; /* Más espacio abajo para que no choque con el botón */
             transition: color 0.3s ease;
         }
 
-        /* MENÚ DE AJUSTES INTERACTIVO */
+        /* 2. CAMBIO DE POSICIÓN: Ajustado a la esquina inferior derecha */
         #config-toggle {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            bottom: 10px;
+            right: 14px;
             background: none;
             border: none;
-            font-size: 1.2em;
+            font-size: 1.25em;
             cursor: pointer;
             opacity: 0.4;
             transition: opacity 0.2s;
+            z-index: 10; /* Asegura que se posicione por encima del fondo */
         }
         #config-toggle:hover { opacity: 1; }
 
@@ -122,7 +122,6 @@
             border-color: #9ca3af;
         }
 
-        /* Selectores de color en línea */
         .control-color {
             display: flex;
             align-items: center;
@@ -151,26 +150,31 @@
 <body>
 
     <div id="header-dinamico">
-        <button id="config-toggle" onclick="toggleAjustes()" title="Personalizar panel">⚙️</button>
-
         <div id="saludo-fecha">
             <span id="saludo"></span> <span id="nombre-usuario"></span>, hoy es <span id="fecha"></span>
         </div>
         
         <div id="frase"></div>
 
+        <!-- El botón del engranaje ahora está abajo a la derecha -->
+        <button id="config-toggle" onclick="toggleAjustes()" title="Personalizar panel">⚙️</button>
+
+        <!-- PANEL DE CONTROL INTERACTIVO -->
         <div id="panel-ajustes">
+            <!-- CONFIGURACIÓN DEL NOMBRE -->
             <div class="seccion-ajuste">
                 <label for="input-nombre">Nombre o Apodo</label>
                 <input type="text" id="input-nombre" placeholder="Ej. Juan José o Misterio" oninput="guardarNombre()">
                 <div class="nota-gris">Ingresa nombre o apodo (si lo desea).</div>
             </div>
 
+            <!-- EDIT COLOR FRASE -->
             <div class="seccion-ajuste control-color">
                 <label style="margin-bottom: 0;">Edit color frase:</label>
                 <input type="color" id="selector-color" value="#ff6b00" onchange="cambiarColorFrase(this.value)">
             </div>
 
+            <!-- CAMBIAR FONDO DE LA VENTANA -->
             <div class="seccion-ajuste">
                 <label>Fondo de la ventana:</label>
                 <div class="control-color" style="margin-top: 4px;">
@@ -183,6 +187,7 @@
                 </div>
             </div>
 
+            <!-- CONFIGURACIÓN DE ACCIONES -->
             <div class="grupo-botones">
                 <button class="btn" onclick="cambiarFrase()">🔄 Cambiar frase</button>
                 <button class="btn" style="margin-left: auto; background-color: #f3f4f6;" onclick="toggleAjustes()">Listo</button>
@@ -265,12 +270,10 @@
             }
         }
 
-        /* LÓGICA DE CONTROL PARA EL FONDO DE LA VENTANA */
         function actualizarOpcionesFondo() {
             const tipo = document.getElementById('selector-tipo-fondo').value;
             const selectorColor = document.getElementById('selector-color-fondo');
             
-            // Mostrar la paleta de colores solo si elige fondo sólido
             if (tipo === 'solido') {
                 selectorColor.style.display = 'inline-block';
             } else {
@@ -297,8 +300,8 @@
                 contenedor.style.background = colorSolido;
                 textoSaludo.style.color = "#37352f";
             } else if (tipo === 'oscuro') {
-                contenedor.style.background = "#202020"; // Fondo gris oscuro tipo Notion Dark
-                textoSaludo.style.color = "#ffffff"; // Cambia texto principal a blanco para contraste
+                contenedor.style.background = "#202020"; 
+                textoSaludo.style.color = "#ffffff"; 
             }
         }
 
