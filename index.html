@@ -36,8 +36,25 @@
             color: #ff6b00; 
             font-size: 1.1em;
             font-weight: 500;
-            margin-bottom: 24px;
+            margin-bottom: 6px; /* Ajustado para que el botón quede cerca */
             transition: color 0.3s ease;
+        }
+
+        /* 2. NUEVO BOTÓN DE ICONO BAJO LA FRASE */
+        #btn-cambiar-frase-icono {
+            background: none;
+            border: none;
+            font-size: 1.1em;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: transform 0.2s, opacity 0.2s;
+            margin-bottom: 20px;
+            padding: 4px;
+            display: inline-block;
+        }
+        #btn-cambiar-frase-icono:hover {
+            opacity: 1;
+            transform: rotate(30deg); /* Efecto visual sutil al pasar el mouse */
         }
 
         #config-toggle {
@@ -99,27 +116,23 @@
 
         .grupo-botones {
             display: flex;
-            gap: 8px;
             margin-top: 12px;
         }
 
         .btn {
-            background-color: #ffffff;
+            background-color: #f3f4f6;
             color: #4b5563;
             border: 1px solid #d1d5db;
-            padding: 6px 12px;
+            padding: 6px 16px;
             font-size: 0.85em;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+            margin-left: auto; /* Alineado a la derecha */
         }
         .btn:hover {
-            background-color: #f9fafb;
+            background-color: #e5e7eb;
             color: #1f2937;
-            border-color: #9ca3af;
         }
 
         .control-color {
@@ -150,13 +163,17 @@
 <body>
 
     <div id="header-dinamico">
-        <!-- BLOQUE DE SALUDO OPTIMIZADO -->
         <div id="saludo-fecha">
             <span id="texto-saludo-completo"></span>
         </div>
         
+        <!-- FRASE MOTIVACIONAL -->
         <div id="frase"></div>
+        
+        <!-- 1 & 2. ICONO REUBICADO JUSTO DEBAJO DE LA FRASE -->
+        <button id="btn-cambiar-frase-icono" onclick="cambiarFrase()" title="Cambiar frase">🔄</button>
 
+        <!-- ENGRANE EN LA PARTE INFERIOR DERECHA -->
         <button id="config-toggle" onclick="toggleAjustes()" title="Personalizar panel">⚙️</button>
 
         <!-- PANEL DE CONTROL INTERACTIVO -->
@@ -185,8 +202,7 @@
             </div>
 
             <div class="grupo-botones">
-                <button class="btn" onclick="cambiarFrase()">🔄 Cambiar frase</button>
-                <button class="btn" style="margin-left: auto; background-color: #f3f4f6;" onclick="toggleAjustes()">Listo</button>
+                <button class="btn" onclick="toggleAjustes()">Listo</button>
             </div>
         </div>
     </div>
@@ -199,7 +215,6 @@
             "Pequeños pasos todos los días conducen a grandes resultados."
         ];
 
-        // Función para poner en mayúscula la primera letra de una palabra
         function capitalizar(cadena) {
             return cadena.charAt(0).toUpperCase() + cadena.slice(1);
         }
@@ -209,7 +224,6 @@
             const hora = ahora.getHours();
             const nombreGuardado = localStorage.getItem('usuario-nombre') || "";
             
-            // 1. Definición del saludo base según la hora
             let saludoBase = "";
             if (hora >= 6 && hora < 12) {
                 saludoBase = "🌅 ¡Buenos días!";
@@ -219,7 +233,6 @@
                 saludoBase = "🌙 ¡Buenas noches!";
             }
 
-            // 2. Formatear la fecha con mayúsculas estilizadas
             const opcionesDia = { weekday: 'long' };
             const opcionesMes = { month: 'long', day: 'numeric', year: 'numeric' };
             
@@ -227,7 +240,6 @@
             const restoFecha = ahora.toLocaleDateString('es-ES', opcionesMes);
             const fechaFormateada = `${diaSemana}, ${restoFecha}`;
 
-            // 3. Ensamblar la frase con la gramática correcta
             let saludoCompleto = "";
             if (nombreGuardado.trim() !== "") {
                 saludoCompleto = `${saludoBase} ${nombreGuardado.trim()}, hoy es ${fechaFormateada}.`;
@@ -239,16 +251,13 @@
         }
 
         function inicializarHeader() {
-            // Cargar datos del Nombre
             const nombreGuardado = localStorage.getItem('usuario-nombre') || "";
             document.getElementById('input-nombre').value = nombreGuardado;
 
-            // Cargar Color de Frase
             const colorGuardado = localStorage.getItem('usuario-color-frase') || "#ff6b00";
             document.getElementById('selector-color').value = colorGuardado;
             cambiarColorFrase(colorGuardado);
 
-            // Cargar Tipo de Fondo
             const tipoFondoGuardado = localStorage.getItem('usuario-tipo-fondo') || "gradiente";
             document.getElementById('selector-tipo-fondo').value = tipoFondoGuardado;
             
@@ -258,7 +267,6 @@
             aplicarFondo(tipoFondoGuardado, colorFondoGuardado);
             actualizarOpcionesFondo();
 
-            // Construir la oración del saludo
             construirSaludo();
             cambiarFrase();
         }
@@ -281,7 +289,7 @@
         function guardarNombre() {
             const nombre = document.getElementById('input-nombre').value;
             localStorage.setItem('usuario-nombre', nombre);
-            construirSaludo(); // Reconstruye la oración inmediatamente mientras escribes
+            construirSaludo(); 
         }
 
         function actualizarOpcionesFondo() {
