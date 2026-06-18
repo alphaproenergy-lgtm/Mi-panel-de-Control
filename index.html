@@ -103,7 +103,6 @@
             margin-top: 2px;
         }
 
-        /* DISEÑO MEJORADO PARA LA CASILLA DE NOMBRE */
         .grupo-entrada {
             display: flex;
             gap: 6px;
@@ -187,11 +186,9 @@
 
         <button id="config-toggle" onclick="toggleAjustes()" title="Personalizar panel">⚙️</button>
 
-        <!-- PANEL DE CONTROL INTERACTIVO -->
         <div id="panel-ajustes">
             <div class="seccion-ajuste">
                 <label for="input-nombre">Nombre o Apodo</label>
-                <!-- Ajuste con botón de aplicar manual para saltar bloqueos de Notion -->
                 <div class="grupo-entrada">
                     <input type="text" id="input-nombre" placeholder="Ej. Juan José" oninput="guardarNombre()">
                     <button class="btn btn-primario" onclick="forzarGuardadoManual()">Aplicar</button>
@@ -230,10 +227,8 @@
             "Pequeños pasos todos los días conducen a grandes resultados."
         ];
 
-        // Variable global de respaldo por si localStorage está bloqueado por Notion
         let memoriaRespaldoNombre = "";
 
-        // Función segura para leer datos evitando bloqueos de iframe
         function obtenerDatoSeguro(clave) {
             try {
                 return localStorage.getItem(clave) || "";
@@ -242,7 +237,6 @@
             }
         }
 
-        // Función segura para escribir datos evitando bloqueos de iframe
         function guardarDatoSeguro(clave, valor) {
             try {
                 localStorage.setItem(clave, valor);
@@ -306,6 +300,13 @@
 
             construirSaludo();
             cambiarFrase();
+
+            // AUTOMATIZACIÓN EN SEGUNDO PLANO:
+            // 1. Rota la frase automáticamente cada 30 minutos (1800000 ms)
+            setInterval(cambiarFrase, 1800000);
+            
+            // 2. Revisa y actualiza la hora del saludo cada 1 minuto (60000 ms) por si cambia de mañana a tarde
+            setInterval(construirSaludo, 60000);
         }
 
         function toggleAjustes() {
