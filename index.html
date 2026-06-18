@@ -36,11 +36,10 @@
             color: #ff6b00; 
             font-size: 1.1em;
             font-weight: 500;
-            margin-bottom: 6px; /* Ajustado para que el botón quede cerca */
+            margin-bottom: 6px;
             transition: color 0.3s ease;
         }
 
-        /* 2. NUEVO BOTÓN DE ICONO BAJO LA FRASE */
         #btn-cambiar-frase-icono {
             background: none;
             border: none;
@@ -54,7 +53,7 @@
         }
         #btn-cambiar-frase-icono:hover {
             opacity: 1;
-            transform: rotate(30deg); /* Efecto visual sutil al pasar el mouse */
+            transform: rotate(30deg);
         }
 
         #config-toggle {
@@ -104,8 +103,14 @@
             margin-top: 2px;
         }
 
+        /* DISEÑO MEJORADO PARA LA CASILLA DE NOMBRE */
+        .grupo-entrada {
+            display: flex;
+            gap: 6px;
+        }
+
         input[type="text"] {
-            width: 100%;
+            flex-grow: 1;
             padding: 6px 10px;
             border: 1px solid #d1d5db;
             border-radius: 4px;
@@ -123,16 +128,25 @@
             background-color: #f3f4f6;
             color: #4b5563;
             border: 1px solid #d1d5db;
-            padding: 6px 16px;
+            padding: 6px 14px;
             font-size: 0.85em;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 500;
-            margin-left: auto; /* Alineado a la derecha */
         }
         .btn:hover {
             background-color: #e5e7eb;
             color: #1f2937;
+        }
+
+        .btn-primario {
+            background-color: #ff6b00;
+            color: white;
+            border: 1px solid #e05e00;
+        }
+        .btn-primario:hover {
+            background-color: #e05e00;
+            color: white;
         }
 
         .control-color {
@@ -164,24 +178,25 @@
 
     <div id="header-dinamico">
         <div id="saludo-fecha">
-            <span id="texto-saludo-completo"></span>
+            <span id="texto-saludo-completo">Cargando saludo...</span>
         </div>
         
-        <!-- FRASE MOTIVACIONAL -->
         <div id="frase"></div>
         
-        <!-- 1 & 2. ICONO REUBICADO JUSTO DEBAJO DE LA FRASE -->
         <button id="btn-cambiar-frase-icono" onclick="cambiarFrase()" title="Cambiar frase">🔄</button>
 
-        <!-- ENGRANE EN LA PARTE INFERIOR DERECHA -->
         <button id="config-toggle" onclick="toggleAjustes()" title="Personalizar panel">⚙️</button>
 
         <!-- PANEL DE CONTROL INTERACTIVO -->
         <div id="panel-ajustes">
             <div class="seccion-ajuste">
                 <label for="input-nombre">Nombre o Apodo</label>
-                <input type="text" id="input-nombre" placeholder="Ej. Juan José o Misterio" oninput="guardarNombre()">
-                <div class="nota-gris">Ingresa nombre o apodo (si lo desea).</div>
+                <!-- Ajuste con botón de aplicar manual para saltar bloqueos de Notion -->
+                <div class="grupo-entrada">
+                    <input type="text" id="input-nombre" placeholder="Ej. Juan José" oninput="guardarNombre()">
+                    <button class="btn btn-primario" onclick="forzarGuardadoManual()">Aplicar</button>
+                </div>
+                <div class="nota-gris">Escribe tu nombre y presiona "Aplicar".</div>
             </div>
 
             <div class="seccion-ajuste control-color">
@@ -202,7 +217,7 @@
             </div>
 
             <div class="grupo-botones">
-                <button class="btn" onclick="toggleAjustes()">Listo</button>
+                <button class="btn" style="margin-left: auto;" onclick="toggleAjustes()">Listo</button>
             </div>
         </div>
     </div>
@@ -215,6 +230,28 @@
             "Pequeños pasos todos los días conducen a grandes resultados."
         ];
 
+        // Variable global de respaldo por si localStorage está bloqueado por Notion
+        let memoriaRespaldoNombre = "";
+
+        // Función segura para leer datos evitando bloqueos de iframe
+        function obtenerDatoSeguro(clave) {
+            try {
+                return localStorage.getItem(clave) || "";
+            } catch (e) {
+                return clave === 'usuario-nombre' ? memoriaRespaldoNombre : "";
+            }
+        }
+
+        // Función segura para escribir datos evitando bloqueos de iframe
+        function guardarDatoSeguro(clave, valor) {
+            try {
+                localStorage.setItem(clave, valor);
+            } catch (e) {
+                if (clave === 'usuario-nombre') memoriaRespaldoNombre = valor;
+                console.log("LocalStorage protegido o bloqueado por Notion. Usando memoria temporal.");
+            }
+        }
+
         function capitalizar(cadena) {
             return cadena.charAt(0).toUpperCase() + cadena.slice(1);
         }
@@ -222,7 +259,7 @@
         function construirSaludo() {
             const ahora = new Date();
             const hora = ahora.getHours();
-            const nombreGuardado = localStorage.getItem('usuario-nombre') || "";
+            const nombreGuardado = obtenerDatoSeguro('usuario-nombre');
             
             let saludoBase = "";
             if (hora >= 6 && hora < 12) {
@@ -251,17 +288,17 @@
         }
 
         function inicializarHeader() {
-            const nombreGuardado = localStorage.getItem('usuario-nombre') || "";
+            const nombreGuardado = obtenerDatoSeguro('usuario-nombre');
             document.getElementById('input-nombre').value = nombreGuardado;
 
-            const colorGuardado = localStorage.getItem('usuario-color-frase') || "#ff6b00";
+            const colorGuardado = obtenerDatoSeguro('usuario-color-frase') || "#ff6b00";
             document.getElementById('selector-color').value = colorGuardado;
             cambiarColorFrase(colorGuardado);
 
-            const tipoFondoGuardado = localStorage.getItem('usuario-tipo-fondo') || "gradiente";
+            const tipoFondoGuardado = obtenerDatoSeguro('usuario-tipo-fondo') || "gradiente";
             document.getElementById('selector-tipo-fondo').value = tipoFondoGuardado;
             
-            const colorFondoGuardado = localStorage.getItem('usuario-color-fondo') || "#f3f4f6";
+            const colorFondoGuardado = obtenerDatoSeguro('usuario-color-fondo') || "#f3f4f6";
             document.getElementById('selector-color-fondo').value = colorFondoGuardado;
             
             aplicarFondo(tipoFondoGuardado, colorFondoGuardado);
@@ -283,13 +320,18 @@
 
         function cambiarColorFrase(nuevoColor) {
             document.getElementById('frase').style.color = nuevoColor;
-            localStorage.setItem('usuario-color-frase', nuevoColor);
+            guardarDatoSeguro('usuario-color-frase', nuevoColor);
         }
 
         function guardarNombre() {
             const nombre = document.getElementById('input-nombre').value;
-            localStorage.setItem('usuario-nombre', nombre);
+            guardarDatoSeguro('usuario-nombre', nombre);
             construirSaludo(); 
+        }
+
+        function forzarGuardadoManual() {
+            guardarNombre();
+            alert("¡Nombre aplicado con éxito!");
         }
 
         function actualizarOpcionesFondo() {
@@ -302,12 +344,12 @@
                 selectorColor.style.display = 'none';
             }
             
-            localStorage.setItem('usuario-tipo-fondo', tipo);
+            guardarDatoSeguro('usuario-tipo-fondo', tipo);
             aplicarFondo(tipo, selectorColor.value);
         }
 
         function cambiarColorFondoSolido(color) {
-            localStorage.setItem('usuario-color-fondo', color);
+            guardarDatoSeguro('usuario-color-fondo', color);
             aplicarFondo('solido', color);
         }
 
