@@ -28,6 +28,7 @@
             margin-bottom: 8px;
             color: #37352f;
             transition: color 0.3s ease;
+            line-height: 1.4;
         }
 
         #frase {
@@ -35,11 +36,10 @@
             color: #ff6b00; 
             font-size: 1.1em;
             font-weight: 500;
-            margin-bottom: 24px; /* Más espacio abajo para que no choque con el botón */
+            margin-bottom: 24px;
             transition: color 0.3s ease;
         }
 
-        /* 2. CAMBIO DE POSICIÓN: Ajustado a la esquina inferior derecha */
         #config-toggle {
             position: absolute;
             bottom: 10px;
@@ -50,7 +50,7 @@
             cursor: pointer;
             opacity: 0.4;
             transition: opacity 0.2s;
-            z-index: 10; /* Asegura que se posicione por encima del fondo */
+            z-index: 10;
         }
         #config-toggle:hover { opacity: 1; }
 
@@ -150,31 +150,28 @@
 <body>
 
     <div id="header-dinamico">
+        <!-- BLOQUE DE SALUDO OPTIMIZADO -->
         <div id="saludo-fecha">
-            <span id="saludo"></span> <span id="nombre-usuario"></span>, hoy es <span id="fecha"></span>
+            <span id="texto-saludo-completo"></span>
         </div>
         
         <div id="frase"></div>
 
-        <!-- El botón del engranaje ahora está abajo a la derecha -->
         <button id="config-toggle" onclick="toggleAjustes()" title="Personalizar panel">⚙️</button>
 
         <!-- PANEL DE CONTROL INTERACTIVO -->
         <div id="panel-ajustes">
-            <!-- CONFIGURACIÓN DEL NOMBRE -->
             <div class="seccion-ajuste">
                 <label for="input-nombre">Nombre o Apodo</label>
                 <input type="text" id="input-nombre" placeholder="Ej. Juan José o Misterio" oninput="guardarNombre()">
                 <div class="nota-gris">Ingresa nombre o apodo (si lo desea).</div>
             </div>
 
-            <!-- EDIT COLOR FRASE -->
             <div class="seccion-ajuste control-color">
                 <label style="margin-bottom: 0;">Edit color frase:</label>
                 <input type="color" id="selector-color" value="#ff6b00" onchange="cambiarColorFrase(this.value)">
             </div>
 
-            <!-- CAMBIAR FONDO DE LA VENTANA -->
             <div class="seccion-ajuste">
                 <label>Fondo de la ventana:</label>
                 <div class="control-color" style="margin-top: 4px;">
@@ -187,7 +184,6 @@
                 </div>
             </div>
 
-            <!-- CONFIGURACIÓN DE ACCIONES -->
             <div class="grupo-botones">
                 <button class="btn" onclick="cambiarFrase()">🔄 Cambiar frase</button>
                 <button class="btn" style="margin-left: auto; background-color: #f3f4f6;" onclick="toggleAjustes()">Listo</button>
@@ -203,30 +199,56 @@
             "Pequeños pasos todos los días conducen a grandes resultados."
         ];
 
-        function inicializarHeader() {
+        // Función para poner en mayúscula la primera letra de una palabra
+        function capitalizar(cadena) {
+            return cadena.charAt(0).toUpperCase() + cadena.slice(1);
+        }
+
+        function construirSaludo() {
             const ahora = new Date();
             const hora = ahora.getHours();
-            let saludo = "¡Hola!";
+            const nombreGuardado = localStorage.getItem('usuario-nombre') || "";
+            
+            // 1. Definición del saludo base según la hora
+            let saludoBase = "";
+            if (hora >= 6 && hora < 12) {
+                saludoBase = "🌅 ¡Buenos días!";
+            } else if (hora >= 12 && hora < 20) {
+                saludoBase = "☀️ ¡Buenas tardes!";
+            } else {
+                saludoBase = "🌙 ¡Buenas noches!";
+            }
 
-            if (hora >= 6 && hora < 12) saludo = "🌅 ¡Buenos días!,";
-            else if (hora >= 12 && hora < 20) saludo = "☀️ ¡Buenas tardes!,";
-            else saludo = "🌙 ¡Buenas noches!,";
-            document.getElementById("saludo").innerText = saludo;
+            // 2. Formatear la fecha con mayúsculas estilizadas
+            const opcionesDia = { weekday: 'long' };
+            const opcionesMes = { month: 'long', day: 'numeric', year: 'numeric' };
+            
+            const diaSemana = capitalizar(ahora.toLocaleDateString('es-ES', opcionesDia));
+            const restoFecha = ahora.toLocaleDateString('es-ES', opcionesMes);
+            const fechaFormateada = `${diaSemana}, ${restoFecha}`;
 
-            const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById("fecha").innerText = ahora.toLocaleDateString('es-ES', opciones);
+            // 3. Ensamblar la frase con la gramática correcta
+            let saludoCompleto = "";
+            if (nombreGuardado.trim() !== "") {
+                saludoCompleto = `${saludoBase} ${nombreGuardado.trim()}, hoy es ${fechaFormateada}.`;
+            } else {
+                saludoCompleto = `${saludoBase} hoy es ${fechaFormateada}.`;
+            }
 
-            // Cargar Nombre
+            document.getElementById("texto-saludo-completo").innerText = saludoCompleto;
+        }
+
+        function inicializarHeader() {
+            // Cargar datos del Nombre
             const nombreGuardado = localStorage.getItem('usuario-nombre') || "";
             document.getElementById('input-nombre').value = nombreGuardado;
-            actualizarVisualizacionNombre(nombreGuardado);
 
             // Cargar Color de Frase
             const colorGuardado = localStorage.getItem('usuario-color-frase') || "#ff6b00";
             document.getElementById('selector-color').value = colorGuardado;
             cambiarColorFrase(colorGuardado);
 
-            // Cargar Tipo de Fondo Guardado
+            // Cargar Tipo de Fondo
             const tipoFondoGuardado = localStorage.getItem('usuario-tipo-fondo') || "gradiente";
             document.getElementById('selector-tipo-fondo').value = tipoFondoGuardado;
             
@@ -236,6 +258,8 @@
             aplicarFondo(tipoFondoGuardado, colorFondoGuardado);
             actualizarOpcionesFondo();
 
+            // Construir la oración del saludo
+            construirSaludo();
             cambiarFrase();
         }
 
@@ -257,17 +281,7 @@
         function guardarNombre() {
             const nombre = document.getElementById('input-nombre').value;
             localStorage.setItem('usuario-nombre', nombre);
-            actualizarVisualizacionNombre(nombre);
-        }
-
-        function actualizarVisualizacionNombre(nombre) {
-            const contenedorNombre = document.getElementById('nombre-usuario');
-            if(nombre.trim() !== "") {
-                contenedorNombre.innerText = nombre;
-                contenedorNombre.style.display = "inline";
-            } else {
-                contenedorNombre.style.display = "none";
-            }
+            construirSaludo(); // Reconstruye la oración inmediatamente mientras escribes
         }
 
         function actualizarOpcionesFondo() {
