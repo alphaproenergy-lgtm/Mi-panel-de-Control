@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Encabezado Dinámico</title>
+    <style>
+        /* PEGUE AQUÍ TODO SU CÓDIGO CSS DE CODEPEN */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PEGUE AQUÍ TODO SU CÓDIGO HTML DE CODEPEN -->
+
+    <script>
+        // PEGUE AQUÍ TODO SU CÓDIGO JAVASCRIPT DE CODEPEN
+    </script>
+</body>
+</html>
