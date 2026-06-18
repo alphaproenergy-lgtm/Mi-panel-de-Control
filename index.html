@@ -4,74 +4,105 @@
     <meta charset="UTF-8">
     <title>Encabezado Dinámico</title>
     <style>
-        body {
+        /* 3. SOLUCIÓN A TAMAÑO Y BARRAS: Forzar que no haya desbordamiento */
+        html, body {
             margin: 0;
             padding: 0;
+            height: 100%;
+            overflow: hidden; /* Elimina por completo las barras laterales y de altura molestas */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             background-color: transparent !important;
-            color: #37352f; /* Color de texto estilo Notion Light */
         }
+
         #header-dinamico {
             padding: 20px;
             border-radius: 8px;
-            background: linear-gradient(135deg, #f3f4f6, #e5e7eb); /* Gradiente gris sutil */
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb); 
             text-align: center;
+            box-sizing: border-box;
         }
+
         #saludo-fecha {
             font-size: 1.4em;
             font-weight: bold;
             margin-bottom: 8px;
+            color: #37352f;
         }
+
+        /* 2. COLOR DE FRASE: Naranja llamativo que resalta */
         #frase {
             font-style: italic;
-            color: #6b7280;
-            font-size: 1em;
+            color: #ff6b00; /* Color Naranja brillante */
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-bottom: 12px;
         }
-        html, body {
-            margin: 0;
-            padding: 0;
-        } 
+
+        /* STYLO DEL BOTÓN RERUN */
+        #btn-rerun {
+            background-color: #ffffff;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+            padding: 4px 12px;
+            font-size: 0.85em;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        #btn-rerun:hover {
+            background-color: #f9fafb;
+            color: #1f2937;
+            border-color: #9ca3af;
+        }
     </style>
 </head>
 <body>
 
-    <!-- CONTENEDORES HTML REQUERIDOS -->
     <div id="header-dinamico">
         <div id="saludo-fecha">
             <span id="saludo"></span>, hoy es <span id="fecha"></span>
         </div>
         <div id="frase"></div>
+        
+        <!-- 1. BOTÓN RERUN INCLUIDO -->
+        <button id="btn-rerun" onclick="cambiarFrase()">🔄 Rerun</button>
     </div>
 
-    <!-- LÓGICA EN JAVASCRIPT -->
     <script>
+        // Guardamos las frases en una lista global para que el botón pueda acceder a ellas
+        const frases = [
+            "El único modo de hacer un gran trabajo es amar lo que haces.",
+            "Haz de hoy tu obra maestra.",
+            "Tu productividad es el resultado de tu enfoque.",
+            "Pequeños pasos todos los días conducen a grandes resultados."
+        ];
+
         function actualizarHeader() {
             const ahora = new Date();
             const hora = ahora.getHours();
             let saludo = "¡Hola!";
 
-            // 1. Saludo Personalizado Dinámico
             if (hora >= 6 && hora < 12) saludo = "🌅 ¡Buenos días!";
             else if (hora >= 12 && hora < 20) saludo = "☀️ ¡Buenas tardes!";
             else saludo = "🌙 ¡Buenas noches!";
             document.getElementById("saludo").innerText = saludo;
 
-            // 2. Fecha Actualizada Automáticamente
             const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById("fecha").innerText = ahora.toLocaleDateString('es-ES', opciones);
 
-            // 3. Frase Motivacional Rotativa
-            const frases = [
-                "El único modo de hacer un gran trabajo es amar lo que haces.",
-                "Haz de hoy tu obra maestra.",
-                "Tu productividad es el resultado de tu enfoque.",
-                "Pequeños pasos todos los días conducen a grandes resultados."
-            ];
+            // Cargar frase inicial
+            cambiarFrase();
+        }
+
+        // Función específica para el botón Rerun
+        function cambiarFrase() {
             const fraseAleatoria = frases[Math.floor(Math.random() * frases.length)];
             document.getElementById("frase").innerText = `"${fraseAleatoria}"`;
         }
 
-        // Ejecutar la función inmediatamente al cargar la página
         actualizarHeader();
     </script>
 </body>
